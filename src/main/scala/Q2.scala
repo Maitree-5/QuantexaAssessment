@@ -4,7 +4,6 @@ import org.apache.spark.sql.{Dataset, SparkSession}
  * Object Q2 contains methods related to analyzing frequent flyers using Spark SQL.
  */
 object Q2 {
-
   /**
    * Retrieves the top 100 frequent flyers based on flight counts.
    *
