@@ -1,4 +1,6 @@
 import org.apache.spark.sql.SparkSession
+import org.apache.spark.sql.functions.{min, max}
+
 /**
  * Main object for running flight analysis using Spark.
  */
@@ -38,10 +40,24 @@ object Main {
       // Q4: Find pairs of passengers who flew together on multiple flights
       val flightsTogetherDS = Q4.findFlightsTogether(flightDataDS)
       flightsTogetherDS.show(false)
-      DatasetUtils.writeDataInCSV(flightsTogetherDS.select("passenger1","passenger2", "numFlightsTogether"),
+      DatasetUtils.writeDataInCSV(flightsTogetherDS.select("passenger1", "passenger2", "numFlightsTogether"),
         "C:\\Users\\maitr\\OneDrive\\Desktop\\Quantexa\\output\\flightsTogether")
-      DatasetUtils.writeDataInCSV(flightsTogetherDS,
+
+      // BonusQ: Find pairs of passengers who flew at least N times together with the range (from,to)
+      // Get the date range from the dataset
+      val dateRange = flightDataDS.agg(
+        min("date").as("minDate"),
+        max("date").as("maxDate")
+      ).collect().head
+      val from = dateRange.getAs[String]("minDate")
+      val to = dateRange.getAs[String]("maxDate")
+      val atLeastNTimes = 3 // This can be dynamically set based on the criteria
+      val flownNFlightsTogether = BonusQ.flownTogether(atLeastNTimes, from, to, flightDataDS)
+      flightsTogetherDS.show(false)
+      DatasetUtils.writeDataInCSV(
+        flownNFlightsTogether.select("passenger1", "passenger2", "numFlightsTogether", "from", "to"),
         "C:\\Users\\maitr\\OneDrive\\Desktop\\Quantexa\\output\\flightsTogetherFull")
+
     } finally {
       spark.stop()
     }

@@ -19,17 +19,14 @@ object Q4 {
         col("t1.flightId") === col("t2.flightId") &&
         col("t1.date") === col("t2.date"),
       "inner"
-    ).groupBy( col("t1.passengerId"), col("t2.passengerId"))
-      .agg( count("*").as("numFlightsTogether"),
-        min("t1.date").as("from"),
-        max("t1.date").as("to"))
-      .where("numFlightsTogether >= 3")
+    ).groupBy(col("t1.passengerId"), col("t2.passengerId"))
+      .agg(count("*").as("numFlightsTogether"))
+      .where("numFlightsTogether > 3")
       .orderBy(col("numFlightsTogether").desc)
-      .selectExpr("t1.passengerId as passenger1",
+      .selectExpr(
+        "t1.passengerId as passenger1",
         "t2.passengerId as passenger2",
-        "numFlightsTogether",
-        "from",
-        "to")
-
+        "numFlightsTogether"
+      )
   }
 }
